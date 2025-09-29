@@ -5,7 +5,7 @@ import {
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
 
-import { ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
+import { logger, ResourceContent } from "mcp-framework";
 
 function marshalFileView(file: FileView): string {
   const obj: { [key: string]: any } = {};
@@ -80,7 +80,7 @@ export function marshalFileRecord(file: FileRecord): string {
 export async function fetchAllDiskImages(
   connector: TaiyiConnector,
   selfOnly: boolean
-): Promise<ReadResourceResult> {
+): Promise<ResourceContent[]> {
   let allImages: FileView[] = [];
   let offset = 0;
   const pageSize = 20;
@@ -124,8 +124,8 @@ export async function fetchAllDiskImages(
     }
 
     // 构建返回多个resource对象，按照指定格式
-    const resourcesList = allImages.map((image) => {
-      const imageURI = `disk-images://${image.id}/detail`;
+    const resourcesList: ResourceContent[] = allImages.map((image) => {
+      const imageURI = `resource://disk-image/${image.id}/detail`;
       const text = marshalFileView(image);
       return {
         uri: imageURI,
@@ -134,21 +134,18 @@ export async function fetchAllDiskImages(
       };
     });
 
-    return {
-      contents: resourcesList,
-    };
+    return resourcesList;
   } catch (error) {
-    console.error("获取磁盘镜像列表失败：", error);
-    return {
-      contents: [
-        {
-          uri: "",
-          mimeType: "text/plain",
-          text: `获取磁盘镜像列表失败：${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        },
-      ],
-    };
+    const output = `获取磁盘镜像列表失败：${
+      error instanceof Error ? error.message : String(error)
+    }`;
+    logger.error(output);
+    return [
+      {
+        uri: "",
+        mimeType: "text/plain",
+        text: output,
+      },
+    ];
   }
 }

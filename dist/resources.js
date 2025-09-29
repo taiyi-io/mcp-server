@@ -1,4 +1,5 @@
 import { ResourceAction, } from "@taiyi-io/api-connector-ts";
+import { logger } from "mcp-framework";
 function marshalFileView(file) {
     const obj = {};
     obj["id"] = file.id;
@@ -103,7 +104,7 @@ export async function fetchAllDiskImages(connector, selfOnly) {
         }
         // 构建返回多个resource对象，按照指定格式
         const resourcesList = allImages.map((image) => {
-            const imageURI = `disk-images://${image.id}/detail`;
+            const imageURI = `resource://disk-image/${image.id}/detail`;
             const text = marshalFileView(image);
             return {
                 uri: imageURI,
@@ -111,20 +112,17 @@ export async function fetchAllDiskImages(connector, selfOnly) {
                 text: text,
             };
         });
-        return {
-            contents: resourcesList,
-        };
+        return resourcesList;
     }
     catch (error) {
-        console.error("获取磁盘镜像列表失败：", error);
-        return {
-            contents: [
-                {
-                    uri: "",
-                    mimeType: "text/plain",
-                    text: `获取磁盘镜像列表失败：${error instanceof Error ? error.message : String(error)}`,
-                },
-            ],
-        };
+        const output = `获取磁盘镜像列表失败：${error instanceof Error ? error.message : String(error)}`;
+        logger.error(output);
+        return [
+            {
+                uri: "",
+                mimeType: "text/plain",
+                text: output,
+            },
+        ];
     }
 }
