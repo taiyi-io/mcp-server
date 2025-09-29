@@ -6,9 +6,8 @@ interface UnmarkSystemDiskImagePromptInput {
 }
 
 class UnmarkSystemDiskImagePrompt extends MCPPrompt<UnmarkSystemDiskImagePromptInput> {
-  name = "unmarkSystemDiskImagePrompt";
-  description =
-    "从资源列表获取磁盘镜像ID后，调用tools取消指定磁盘镜像的系统标记";
+  name = "unmark-system-disk-image-prompt";
+  description = "取消指定名称的磁盘镜像的系统标记";
 
   schema = {
     imageName: {
@@ -24,7 +23,7 @@ class UnmarkSystemDiskImagePrompt extends MCPPrompt<UnmarkSystemDiskImagePromptI
         role: "user",
         content: {
           type: "text",
-          text: `从镜像列表获取名称为 ${imageName} 的磁盘镜像ID，然后调用unmarkSystemDiskImage取消系统标记`,
+          text: `从resource://disk-image/磁盘镜像列表获取名称为 ${imageName} 的磁盘镜像ID，然后调用mcp:unmark-system-disk-image取消系统标记`,
         },
       },
     ];

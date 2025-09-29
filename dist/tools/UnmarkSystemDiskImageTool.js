@@ -4,7 +4,7 @@ import { getConnector } from "../server.js";
 import { ResourceType } from "@taiyi-io/api-connector-ts";
 class UnmarkSystemDiskImageTool extends MCPTool {
     name = "unmark-system-disk-image";
-    description = "取消指定的系统磁盘镜像标记";
+    description = "根据指定id取消磁盘镜像的系统标记";
     schema = {
         imageID: {
             type: z.string(),

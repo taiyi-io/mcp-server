@@ -4,7 +4,7 @@ import { getConnector } from "../server.js";
 class DiskImageListResource extends MCPResource {
     uri = "resource://disk-image/";
     name = "磁盘镜像列表";
-    description = "获取所有磁盘镜像的列表";
+    description = "返回当前用户可以访问的所有磁盘镜像列表，包含id、名称、描述、创建修改时间、容量信息";
     mimeType = "application/json";
     async read() {
         const connector = await getConnector();

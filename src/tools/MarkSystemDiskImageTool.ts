@@ -9,7 +9,7 @@ interface MarkSystemDiskImageInput {
 
 class MarkSystemDiskImageTool extends MCPTool<MarkSystemDiskImageInput> {
   name = "mark-system-disk-image";
-  description = "将指定的磁盘镜像标记为系统磁盘镜像";
+  description = "根据指定id将磁盘镜像标记为系统磁盘镜像";
 
   schema = {
     imageID: {

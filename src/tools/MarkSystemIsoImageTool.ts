@@ -3,32 +3,32 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 import { ResourceType } from "@taiyi-io/api-connector-ts";
 
-interface UnmarkSystemDiskImageInput {
+interface MarkSystemIsoImageInput {
   imageID: string;
 }
 
-class UnmarkSystemDiskImageTool extends MCPTool<UnmarkSystemDiskImageInput> {
-  name = "unmark-system-disk-image";
-  description = "根据指定id取消磁盘镜像的系统标记";
+class MarkSystemIsoImageTool extends MCPTool<MarkSystemIsoImageInput> {
+  name = "mark-system-iso-image";
+  description = "根据指定id将ISO镜像标记为系统ISO镜像";
 
   schema = {
     imageID: {
       type: z.string(),
-      description: "磁盘镜像的ID",
+      description: "ISO镜像的ID",
     },
   };
 
-  async execute(input: UnmarkSystemDiskImageInput) {
+  async execute(input: MarkSystemIsoImageInput) {
     try {
       const connector = await getConnector();
       await connector.setSystemResource(
-        ResourceType.DiskImage,
+        ResourceType.ISOImage,
         input.imageID,
-        false
+        true
       );
-      return `成功取消磁盘镜像 ${input.imageID} 的系统磁盘镜像标记`;
+      return `成功将ISO镜像 ${input.imageID} 标记为系统ISO镜像`;
     } catch (error) {
-      const output = `取消系统磁盘镜像标记失败：${
+      const output = `标记系统ISO镜像失败：${
         error instanceof Error ? error.message : String(error)
       }`;
       logger.error(output);
@@ -37,4 +37,4 @@ class UnmarkSystemDiskImageTool extends MCPTool<UnmarkSystemDiskImageInput> {
   }
 }
 
-export default UnmarkSystemDiskImageTool;
+export default MarkSystemIsoImageTool;
