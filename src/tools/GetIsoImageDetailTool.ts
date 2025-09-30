@@ -1,7 +1,7 @@
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
-import { marshalFileRecord } from "../resources.js";
+import { marshalFileRecord } from "../utils.js";
 import { FileStatus } from "@taiyi-io/api-connector-ts";
 
 interface GetIsoImageDetailInput {

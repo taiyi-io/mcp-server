@@ -1,7 +1,7 @@
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
-import { marshalFileRecord } from "../resources.js";
+import { marshalFileRecord } from "../utils.js";
 class GetIsoImageDetailTool extends MCPTool {
     name = "get-iso-image-detail";
     description = "根据指定id获取ISO镜像详情";

@@ -1,7 +1,7 @@
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
-import { marshalFileRecord } from "../resources.js";
+import { marshalFileRecord } from "../utils.js";
 class GetDiskImageDetailTool extends MCPTool {
     name = "get-disk-image-detail";
     description = "根据指定id获取磁盘镜像详情";
