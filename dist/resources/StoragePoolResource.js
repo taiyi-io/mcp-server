@@ -1,0 +1,73 @@
+import { MCPResource, logger } from "mcp-framework";
+import { getConnector } from "../server.js";
+/**
+ * 将StoragePoolListRecord对象转换为JSON字符串
+ */
+function marshalStoragePool(pool) {
+    const obj = {};
+    obj["标识"] = pool.id;
+    obj["类型"] = pool.type;
+    obj["分配策略"] = pool.strategy;
+    if (pool.description) {
+        obj["描述"] = pool.description;
+    }
+    obj["存储容器数量"] = pool.containers;
+    obj["已分配磁盘卷"] = pool.allocated_volumes;
+    if (pool.used_size !== undefined && pool.used_size !== null) {
+        obj["已使用容量"] = `${(pool.used_size / 1024).toFixed(2)}GB`;
+    }
+    if (pool.available_size) {
+        obj["可用容量"] = `${(pool.available_size / 1024).toFixed(2)}GB`; // 修正拼写错误，将avaliable改为available
+    }
+    if (pool.max_size) {
+        obj["最大容量"] = `${(pool.max_size / 1024).toFixed(2)}GB`;
+    }
+    return JSON.stringify(obj);
+}
+/**
+ * 存储资源池列表资源
+ * 返回当前用户可以访问的所有存储资源池列表
+ */
+class StoragePoolResource extends MCPResource {
+    uri = "resource://storage-pool/";
+    name = "存储资源池列表";
+    description = "返回当前用户可以访问的所有存储资源池列表，包含标识、类型、分配策略、描述、存储容器数量、已分配磁盘卷、已使用容量、可用容量和最大容量信息。通常用于创建云主机或管理存储资源时，选择目标存储池。";
+    mimeType = "application/json";
+    async read() {
+        const connector = await getConnector();
+        try {
+            // 调用queryStoragePools一次性获取所有存储资源池
+            const result = await connector.queryStoragePools();
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            else if (!result.data) {
+                throw new Error("获取存储资源池列表失败：返回数据为空");
+            }
+            const pools = result.data;
+            // 构建返回多个resource对象，按照指定格式
+            const resourcesList = pools.map((pool) => {
+                const poolURI = `resource://storage-pool/${pool.id}/detail`;
+                const text = marshalStoragePool(pool);
+                return {
+                    uri: poolURI,
+                    mimeType: "application/json",
+                    text: text,
+                };
+            });
+            return resourcesList;
+        }
+        catch (error) {
+            const output = `获取存储资源池列表失败：${error instanceof Error ? error.message : String(error)}`;
+            logger.error(output);
+            return [
+                {
+                    uri: "",
+                    mimeType: "text/plain",
+                    text: output,
+                },
+            ];
+        }
+    }
+}
+export default StoragePoolResource;
