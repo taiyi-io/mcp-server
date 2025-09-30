@@ -1,4 +1,7 @@
 import {
+  ConsoleEvent,
+  ConsoleEventLevel,
+  ConsoleEventRange,
   FileRecord,
   FileView,
   GuestFilter,
@@ -7,9 +10,61 @@ import {
   ResourceAction,
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
+export function marshalConsoleEvent(event: ConsoleEvent): string {
+  const obj: Record<string, any> = {};
 
-import { logger, ResourceContent } from "mcp-framework";
+  // 映射属性
+  if (event.level) {
+    switch (event.level) {
+      case ConsoleEventLevel.Info:
+        obj["级别"] = "信息";
+        break;
+      case ConsoleEventLevel.Warning:
+        obj["级别"] = "告警";
+        break;
+      case ConsoleEventLevel.Alert:
+        obj["级别"] = "警报";
+        break;
+      case ConsoleEventLevel.Critical:
+        obj["级别"] = "致命";
+        break;
+      default:
+        obj["级别"] = event.level;
+        break;
+    }
+  }
 
+  if (event.range) {
+    switch (event.range) {
+      case ConsoleEventRange.System:
+        obj["范围"] = "系统";
+        break;
+      case ConsoleEventRange.Cluster:
+        obj["范围"] = "集群";
+        break;
+      case ConsoleEventRange.Node:
+        obj["范围"] = "节点";
+        break;
+      case ConsoleEventRange.Pool:
+        obj["范围"] = "资源池";
+        break;
+      default:
+        obj["范围"] = event.range;
+        break;
+    }
+  }
+
+  if (event.message !== undefined) {
+    obj["内容"] = event.message;
+  }
+
+  if (event.timestamp !== undefined) {
+    // 将RFC3339格式转换为本地时间
+    const localTime = new Date(event.timestamp).toLocaleString();
+    obj["时间"] = localTime;
+  }
+  return JSON.stringify(obj);
+}
 export function marshalFileView(file: FileView): string {
   const obj: { [key: string]: any } = {};
   obj["id"] = file.id;
