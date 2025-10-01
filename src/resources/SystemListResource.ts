@@ -5,6 +5,7 @@ import {
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
+import { marshalPermissions } from "../utils.js";
 
 /**
  * 系统模板视图转换函数
@@ -46,29 +47,7 @@ function marshalSystemView(view: GuestSystemView): string {
     obj["启动方式"] = view.firmware;
   }
 
-  // 处理权限相关信息
-  if (view.permissions && view.permissions.owner !== undefined) {
-    obj["拥有者"] = view.permissions.owner;
-  }
-
-  // 处理操作权限
-  if (view.actions && Array.isArray(view.actions)) {
-    const permissions: string[] = [];
-    if (view.actions.includes(ResourceAction.Edit)) {
-      permissions.push("编辑");
-    }
-    if (view.actions.includes(ResourceAction.Delete)) {
-      permissions.push("删除");
-    }
-    if (view.actions.includes(ResourceAction.View)) {
-      permissions.push("浏览");
-    }
-
-    if (permissions.length > 0) {
-      obj["权限"] = permissions.join("|");
-    }
-  }
-
+  marshalPermissions(view, obj);
   return JSON.stringify(obj);
 }
 
@@ -92,17 +71,21 @@ class SystemListResource extends MCPResource {
 
     try {
       // 第一次请求获取总数
-      const firstResponse = await connector.querySystems(offset, pageSize, false);
-      
+      const firstResponse = await connector.querySystems(
+        offset,
+        pageSize,
+        false
+      );
+
       if (firstResponse.error) {
         throw new Error(firstResponse.error);
       } else if (!firstResponse?.data) {
         throw new Error("获取系统模板列表失败：返回数据为空");
       }
-      
+
       total = firstResponse?.data?.total || 0;
-      allSystems = firstResponse?.data?.records 
-        ? [...firstResponse.data.records] 
+      allSystems = firstResponse?.data?.records
+        ? [...firstResponse.data.records]
         : [];
 
       // 根据总数计算需要请求的偏移量
@@ -148,7 +131,7 @@ class SystemListResource extends MCPResource {
 
       return resources;
     } catch (error) {
-      const errorMessage = 
+      const errorMessage =
         error instanceof Error ? error.message : String(error);
       logger.error(`读取系统模板列表资源时发生错误: ${errorMessage}`);
       return [

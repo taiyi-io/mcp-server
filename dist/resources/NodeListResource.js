@@ -1,5 +1,5 @@
 import { MCPResource, logger } from "mcp-framework";
-import { NodeMode } from "@taiyi-io/api-connector-ts";
+import { NodeMode, } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
 /**
  * 节点列表资源
@@ -22,57 +22,16 @@ class NodeListResource extends MCPResource {
             }
             const nodes = result.data;
             const resources = [];
-            // 处理节点数据
-            if (Array.isArray(nodes)) {
-                nodes.forEach((node) => {
-                    const nodeData = {};
-                    // 映射属性
-                    if (node.mode === NodeMode.Control) {
-                        nodeData["模式"] = "主控节点";
-                    }
-                    else if (node.mode === NodeMode.Resource) {
-                        nodeData["模式"] = "资源节点";
-                    }
-                    if (node.id !== undefined) {
-                        nodeData["标识"] = node.id;
-                    }
-                    if (node.name !== undefined) {
-                        nodeData["名称"] = node.name;
-                    }
-                    if (node.host && node.port) {
-                        nodeData["服务地址"] = `${node.host}:${node.port}`;
-                    }
-                    if (node.pool !== undefined) {
-                        nodeData["所属资源池"] = node.pool;
-                    }
-                    if (node.disabled === true) {
-                        nodeData["已禁用"] = true;
-                    }
-                    if (node.critical !== undefined) {
-                        nodeData["致命故障"] = node.critical;
-                    }
-                    if (node.alert !== undefined) {
-                        nodeData["警报"] = node.alert;
-                    }
-                    if (node.warning !== undefined) {
-                        nodeData["告警"] = node.warning;
-                    }
-                    // 确保在创建URI之前有ID
-                    if (node.id !== undefined) {
-                        resources.push({
-                            uri: `${this.uri}${node.id}`,
-                            mimeType: this.mimeType,
-                            text: JSON.stringify(nodeData),
-                        });
-                    }
-                    else {
-                        logger.warn("发现没有ID的节点，跳过资源创建");
-                    }
+            nodes.forEach((node) => {
+                if (!node.id) {
+                    throw new Error("节点数据中缺少ID");
+                }
+                resources.push({
+                    uri: `${this.uri}${node.id}`,
+                    mimeType: this.mimeType,
+                    text: marshalNodeData(node),
                 });
-            }
-            else {
-                logger.warn("queryNodes返回非数组结果");
-            }
+            });
             return resources;
         }
         catch (error) {
@@ -89,3 +48,30 @@ class NodeListResource extends MCPResource {
     }
 }
 export default NodeListResource;
+function marshalNodeData(node) {
+    const nodeData = {};
+    // 映射属性
+    if (node.mode === NodeMode.Control) {
+        nodeData["模式"] = "主控节点";
+    }
+    else if (node.mode === NodeMode.Resource) {
+        nodeData["模式"] = "资源节点";
+    }
+    if (node.id !== undefined) {
+        nodeData["标识"] = node.id;
+    }
+    if (node.name !== undefined) {
+        nodeData["名称"] = node.name;
+    }
+    if (node.host && node.port) {
+        nodeData["服务地址"] = `${node.host}:${node.port}`;
+    }
+    if (node.pool !== undefined) {
+        nodeData["所属资源池"] = node.pool;
+    }
+    if (node.disabled === true) {
+        nodeData["已禁用"] = true;
+    }
+    nodeData["故障"] = `致命${node.critical}, 警报${node.alert}, 告警${node.warning}`;
+    return JSON.stringify(nodeData);
+}

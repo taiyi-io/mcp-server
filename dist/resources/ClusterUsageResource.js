@@ -1,5 +1,6 @@
 import { MCPResource, logger } from "mcp-framework";
 import { getConnector } from "../server.js";
+import { marshalDiskSpeed, marshalNetworkSpeed } from "../utils.js";
 function formatRuntime(startedTime) {
     try {
         const startTime = new Date(startedTime);
@@ -55,6 +56,8 @@ function marshalClusterUsage(snapshot) {
     }
     // 状态信息
     obj["状态"] = `致命故障 ${snapshot.critical}, 报警 ${snapshot.alert}, 警告 ${snapshot.warning}`;
+    obj["磁盘速度"] = marshalDiskSpeed(snapshot.read_bytes_per_second, snapshot.write_bytes_per_second);
+    obj["网络带宽"] = marshalNetworkSpeed(snapshot.received_bytes_per_second, snapshot.transmitted_bytes_per_second);
     return JSON.stringify(obj);
 }
 /**
@@ -63,7 +66,7 @@ function marshalClusterUsage(snapshot) {
  */
 class ClusterUsageResource extends MCPResource {
     uri = "resource://cluster-usage";
-    name = "集群使用情况";
+    name = "集群资源用量";
     description = "返回当前集群的整体使用情况和状态信息，包含节点状态、资源池状态、运行时间、云主机状态、核心利用率、内存利用率、磁盘利用率和系统状态。";
     mimeType = "application/json";
     async read() {

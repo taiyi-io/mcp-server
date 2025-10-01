@@ -1,6 +1,6 @@
 import { MCPResource, logger } from "mcp-framework";
-import { ResourceAction, } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
+import { marshalPermissions } from "../utils.js";
 /**
  * 系统模板视图转换函数
  * 将系统模板对象转换为JSON字符串
@@ -32,26 +32,7 @@ function marshalSystemView(view) {
     if (view.firmware !== undefined) {
         obj["启动方式"] = view.firmware;
     }
-    // 处理权限相关信息
-    if (view.permissions && view.permissions.owner !== undefined) {
-        obj["拥有者"] = view.permissions.owner;
-    }
-    // 处理操作权限
-    if (view.actions && Array.isArray(view.actions)) {
-        const permissions = [];
-        if (view.actions.includes(ResourceAction.Edit)) {
-            permissions.push("编辑");
-        }
-        if (view.actions.includes(ResourceAction.Delete)) {
-            permissions.push("删除");
-        }
-        if (view.actions.includes(ResourceAction.View)) {
-            permissions.push("浏览");
-        }
-        if (permissions.length > 0) {
-            obj["权限"] = permissions.join("|");
-        }
-    }
+    marshalPermissions(view, obj);
     return JSON.stringify(obj);
 }
 /**

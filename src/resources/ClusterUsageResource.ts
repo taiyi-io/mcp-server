@@ -4,6 +4,7 @@ import {
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
+import { marshalDiskSpeed, marshalNetworkSpeed } from "../utils.js";
 
 function formatRuntime(startedTime: string): string {
   try {
@@ -81,7 +82,14 @@ function marshalClusterUsage(snapshot: ClusterResourceSnapshot): string {
   obj[
     "状态"
   ] = `致命故障 ${snapshot.critical}, 报警 ${snapshot.alert}, 警告 ${snapshot.warning}`;
-
+  obj["磁盘速度"] = marshalDiskSpeed(
+    snapshot.read_bytes_per_second,
+    snapshot.write_bytes_per_second
+  );
+  obj["网络带宽"] = marshalNetworkSpeed(
+    snapshot.received_bytes_per_second,
+    snapshot.transmitted_bytes_per_second
+  );
   return JSON.stringify(obj);
 }
 

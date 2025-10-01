@@ -13,14 +13,8 @@ function marshalStoragePool(pool) {
     }
     obj["存储容器数量"] = pool.containers;
     obj["已分配磁盘卷"] = pool.allocated_volumes;
-    if (pool.used_size !== undefined && pool.used_size !== null) {
-        obj["已使用容量"] = `${(pool.used_size / 1024).toFixed(2)}GB`;
-    }
-    if (pool.available_size) {
-        obj["可用容量"] = `${(pool.available_size / 1024).toFixed(2)}GB`; // 修正拼写错误，将avaliable改为available
-    }
-    if (pool.max_size) {
-        obj["最大容量"] = `${(pool.max_size / 1024).toFixed(2)}GB`;
+    if (pool.used_size && pool.max_size) {
+        obj["磁盘用量"] = `${(pool.used_size / 1024).toFixed(2)} / ${Math.ceil(pool.max_size / 1024)}GB`;
     }
     return JSON.stringify(obj);
 }
@@ -31,7 +25,7 @@ function marshalStoragePool(pool) {
 class StoragePoolResource extends MCPResource {
     uri = "resource://storage-pool/";
     name = "存储资源池列表";
-    description = "返回当前用户可以访问的所有存储资源池列表，包含标识、类型、分配策略、描述、存储容器数量、已分配磁盘卷、已使用容量、可用容量和最大容量信息。通常用于创建云主机或管理存储资源时，选择目标存储池。";
+    description = "返回当前用户可以访问的所有存储资源池列表，包含标识、类型、分配策略、描述、存储容器数量、已分配磁盘卷、已使用容量、可用容量和最大容量信息。通常用于查看存储利用状况和创建计算资源池时，选择目标存储";
     mimeType = "application/json";
     async read() {
         const connector = await getConnector();
