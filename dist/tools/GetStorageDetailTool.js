@@ -28,7 +28,7 @@ function marshalStoragePool(pool) {
 }
 class GetStorageDetailTool extends MCPTool {
     name = "get-storage-detail";
-    description = "根据指定id获取存储池详情，包含标识、类型、分配策略、描述和容器列表，通常用于检查后端存储负载和存储用量";
+    description = "根据指定id获取存储池详情，包含标识、类型、分配策略、描述和容器资源用量列表，通常用于检查后端存储负载和存储用量";
     schema = {
         storagePoolID: {
             type: z.string(),

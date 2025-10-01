@@ -3,7 +3,7 @@ import { z } from "zod";
 import { StatisticRange } from "@taiyi-io/api-connector-ts";
 interface GetGuestStatisticUsageInput {
     guestID: string;
-    range: string;
+    range: StatisticRange;
 }
 declare class GetGuestStatisticUsageTool extends MCPTool<GetGuestStatisticUsageInput> {
     name: string;

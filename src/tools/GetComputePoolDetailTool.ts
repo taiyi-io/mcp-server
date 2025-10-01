@@ -42,7 +42,7 @@ function marshalComputePool(pool: ComputePoolStatus): string {
 class GetComputePoolDetailTool extends MCPTool<GetComputePoolDetailInput> {
   name = "get-compute-pool-detail";
   description =
-    "根据指定id获取计算资源池详情，包含标识、描述、存储池、地址池、状态和资源限制信息，通常用于选择和判断计算资源池";
+    "根据指定id获取计算资源池详情，包含标识、描述、存储池、地址池、状态和资源容量信息，通常用于选择和判断计算资源池";
 
   schema = {
     poolID: {

@@ -26,15 +26,24 @@ function marshalSystemView(view) {
     if (view.network !== undefined) {
         obj["网卡"] = view.network;
     }
+    obj["显卡"] = view.display;
+    obj["控制协议"] = view.control;
     if (view.firmware !== undefined) {
         obj["启动方式"] = view.firmware;
+    }
+    obj["usb设备"] = view.usb;
+    if (view.sound !== undefined) {
+        obj["声卡设备"] = view.sound;
+    }
+    if (view.tablet !== undefined) {
+        obj["平板设备"] = view.tablet;
     }
     marshalPermissions(view, obj);
     return JSON.stringify(obj);
 }
 class GetSystemDetailTool extends MCPTool {
     name = "get-system-detail";
-    description = "根据指定id获取系统详情，包含标识、名称、操作系统、磁盘配置、网络配置和权限信息等";
+    description = "根据指定id获取系统详情，包含标识、名称、操作系统、磁盘、网络、显卡、控制协议、启动方式等硬件配置以及权限信息";
     schema = {
         systemID: {
             type: z.string(),

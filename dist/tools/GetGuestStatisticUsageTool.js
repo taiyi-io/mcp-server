@@ -29,7 +29,7 @@ spec) {
 }
 class GetGuestStatisticUsageTool extends MCPTool {
     name = "get-guest-statistic-usage";
-    description = "获取云主机的统计资源使用情况，包含CPU、内存、磁盘和网络的平均使用数据，通常用于分析云主机的历史性能表现";
+    description = "获取云主机的统计资源使用情况，CPU、内存、磁盘负载和磁盘读写速度，网络收发带宽等信息，通常用于分析云主机的历史性能表现和资源用量。统计范围可以选择最近1小时、最近24小时、最近7天、最近30天，返回数据包含多个时间点数据序列，每个时间点包含对应时刻的指标平均值";
     schema = {
         guestID: {
             type: z.string(),
@@ -42,7 +42,7 @@ class GetGuestStatisticUsageTool extends MCPTool {
                 StatisticRange.Last30Days,
                 StatisticRange.Last7Days,
             ]),
-            description: "时间范围",
+            description: "历史数据统计范围，可选值为last_hour, last_24_hours, last_7_days, last_30_days，对应最近1小时、最近24小时、最近7天、最近30天",
             example: StatisticRange.LastHour,
         },
     };

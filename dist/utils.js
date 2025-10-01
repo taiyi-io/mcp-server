@@ -57,7 +57,11 @@ export function marshalNetworkSpeed(received_bytes_per_second, transmitted_bytes
     return `接收 ${netReceivedConverted} / 发送 ${netTransmittedConverted} ${netUnit}`;
 }
 export function marshalPermissions(value, obj) {
-    obj["拥有者"] = value.permissions.owner;
+    // owner的格式为user.namespace@domain，仅提取user部分展示
+    if (value.permissions.owner) {
+        const userPart = value.permissions.owner.split(".")[0];
+        obj["拥有者"] = userPart;
+    }
     let permissions = [];
     if (value.actions && value.actions.includes(ResourceAction.Edit)) {
         permissions.push("编辑");

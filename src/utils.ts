@@ -87,7 +87,11 @@ export function marshalPermissions(
   value: priviledgeObject,
   obj: Record<string, any>
 ) {
-  obj["拥有者"] = value.permissions.owner;
+  // owner的格式为user.namespace@domain，仅提取user部分展示
+  if (value.permissions.owner) {
+    const userPart = value.permissions.owner.split(".")[0];
+    obj["拥有者"] = userPart;
+  }
   let permissions: string[] = [];
   if (value.actions && value.actions.includes(ResourceAction.Edit)) {
     permissions.push("编辑");

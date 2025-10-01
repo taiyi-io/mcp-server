@@ -10,7 +10,8 @@ interface GetIsoImageDetailInput {
 
 class GetIsoImageDetailTool extends MCPTool<GetIsoImageDetailInput> {
   name = "get-iso-image-detail";
-  description = "根据指定id获取ISO镜像详情";
+  description =
+    "根据指定id获取ISO镜像详情，包含镜像容量、名称描述和创建修改时间信息";
 
   schema = {
     imageID: {

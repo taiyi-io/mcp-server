@@ -1,4 +1,4 @@
-import { NodeMode, } from "@taiyi-io/api-connector-ts";
+import { NodeMode, NodeState, } from "@taiyi-io/api-connector-ts";
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
@@ -10,6 +10,21 @@ function marshalNodeData(node) {
     }
     else if (node.mode === NodeMode.Resource) {
         nodeData["模式"] = "资源节点";
+    }
+    // 映射节点状态
+    switch (node.state) {
+        case NodeState.Connected:
+            nodeData["运行状态"] = "已连接";
+            break;
+        case NodeState.Disconnected:
+            nodeData["运行状态"] = "已断开";
+            break;
+        case NodeState.Ready:
+            nodeData["运行状态"] = "已就绪";
+            break;
+        case NodeState.Lost:
+            nodeData["运行状态"] = "已丢失";
+            break;
     }
     if (node.id !== undefined) {
         nodeData["标识"] = node.id;
@@ -46,7 +61,7 @@ function marshalNodeData(node) {
 }
 class GetNodeDetailTool extends MCPTool {
     name = "get-node-detail";
-    description = "根据指定id获取节点详情，包含节点标识、名称、模式、服务地址、所属资源池和状态信息等，通常用于判断节点负载情况和业务压力";
+    description = "根据指定id获取节点详情，包含标识、名称、模式、服务地址、所属资源池、运行状态、版本、资源容量、故障数量等，通常用于判断节点负载情况和业务压力";
     schema = {
         nodeID: {
             type: z.string(),

@@ -17,7 +17,7 @@ function marshalUsageDate(usage, spec) {
 }
 class GetGuestRealtimeUsageTool extends MCPTool {
     name = "get-guest-realtime-usage";
-    description = "获取云主机的实时资源使用情况，包含CPU使用率、内存使用量、网络和磁盘IO等信息，通常用于监控云主机的实时运行状态";
+    description = "获取云主机的实时资源使用情况，包含CPU、内存、磁盘负载和磁盘读写速度，网络收发带宽等信息，通常用于监控云主机的实时运行状态，仅限运行中云主机调用";
     schema = {
         guestID: {
             type: z.string(),
