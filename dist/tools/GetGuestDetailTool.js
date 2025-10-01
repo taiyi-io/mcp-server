@@ -4,7 +4,7 @@ import { getConnector } from "../server.js";
 import { marshalGuestView } from "../utils.js";
 class GetGuestDetailTool extends MCPTool {
     name = "get-guest-detail";
-    description = "根据指定ID获取云主机详情，包含标识、主机名、核心数、内存、磁盘配置、运行状态、网络速度、磁盘io带宽、所属宿主机资源池和权限信息，通常用于查看和判断云主机";
+    description = "根据指定ID获取云主机详情，包含标识、主机名、核心数、内存、磁盘配置、网卡MAC及IP、运行状态、网络速度、磁盘io带宽、所属宿主机资源池和权限信息，通常用于查看和判断云主机";
     schema = {
         guestID: {
             type: z.string(),

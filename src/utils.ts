@@ -328,19 +328,45 @@ export function marshalGuestView(view: GuestView): string {
     obj["内存"] = `${view.memory} MiB`;
   }
 
-  // 处理磁盘信息
-  if (view.disks && Array.isArray(view.disks)) {
-    const diskSizes: string[] = [];
-    view.disks.forEach((disk) => {
-      if (disk.size) {
-        const sizeInGB = (disk.size / 1024).toFixed(2);
-        diskSizes.push(`${sizeInGB} GB`);
-      }
-    });
-    if (diskSizes.length > 0) {
-      obj["磁盘"] = diskSizes.join(", ");
+  let totalSize = 0;
+  let diskLabels: string[] = [];
+  view.disks.forEach((disk) => {
+    if (disk.size) {
+      totalSize += disk.size;
+      diskLabels.push(`磁盘${disk.tag}: ${(disk.size / 1024).toFixed(2)} GB`);
     }
+  });
+  obj["磁盘"] = `总容量 ${(totalSize / 1024).toFixed(2)} GB, ${diskLabels.join(
+    " /"
+  )}`;
+
+  //网卡
+  let netLabels: string[] = [];
+  if (view.network_interfaces.external) {
+    view.network_interfaces.external.forEach((net) => {
+      let label = `外部网卡${net.mac_address}`;
+      if (net.ip_address) {
+        label += `, IPv4: ${net.ip_address}`;
+      }
+      if (net.ip_address_v6) {
+        label += `, IPv6: ${net.ip_address_v6}`;
+      }
+      netLabels.push(label);
+    });
   }
+  if (view.network_interfaces.internal) {
+    view.network_interfaces.internal.forEach((net) => {
+      let label = `内部网卡${net.mac_address}`;
+      if (net.ip_address) {
+        label += `, IPv4: ${net.ip_address}`;
+      }
+      if (net.ip_address_v6) {
+        label += `, IPv6: ${net.ip_address_v6}`;
+      }
+      netLabels.push(label);
+    });
+  }
+  obj["网卡"] = netLabels.join(" /");
 
   if (view.auto_start === true) {
     obj["开机启动"] = true;

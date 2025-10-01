@@ -2,7 +2,8 @@ import { MCPServer, logger } from "mcp-framework";
 import { newInsecureConnector, } from "@taiyi-io/api-connector-ts";
 import os from "os";
 import dotenv from "dotenv";
-dotenv.config();
+//防止输出stdio干扰mcpserver
+dotenv.config({ quiet: true });
 let connector = undefined;
 export async function getConnector() {
     if (!connector) {

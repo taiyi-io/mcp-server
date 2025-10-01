@@ -5,9 +5,8 @@ import {
 } from "@taiyi-io/api-connector-ts";
 import os from "os";
 import dotenv from "dotenv";
-
-dotenv.config();
-
+//防止输出stdio干扰mcpserver
+dotenv.config({ quiet: true });
 let connector: TaiyiConnector | undefined = undefined;
 
 export async function getConnector(): Promise<TaiyiConnector> {
