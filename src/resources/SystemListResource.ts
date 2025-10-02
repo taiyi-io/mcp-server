@@ -5,7 +5,7 @@ import {
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
-import { marshalPermissions } from "../utils.js";
+import { getAllSystems, marshalPermissions } from "../utils.js";
 
 /**
  * 系统模板视图转换函数
@@ -64,70 +64,23 @@ class SystemListResource extends MCPResource {
 
   async read(): Promise<ResourceContent[]> {
     const connector: TaiyiConnector = await getConnector();
-    let allSystems: GuestSystemView[] = [];
-    let offset = 0;
-    const pageSize = 20;
-    let total = 0;
 
     try {
-      // 第一次请求获取总数
-      const firstResponse = await connector.querySystems(
-        offset,
-        pageSize,
-        false
-      );
-
-      if (firstResponse.error) {
-        throw new Error(firstResponse.error);
-      } else if (!firstResponse?.data) {
-        throw new Error("获取系统模板列表失败：返回数据为空");
-      }
-
-      total = firstResponse?.data?.total || 0;
-      allSystems = firstResponse?.data?.records
-        ? [...firstResponse.data.records]
-        : [];
-
-      // 根据总数计算需要请求的偏移量
-      const requests = [];
-      offset += pageSize;
-
-      // 从下一个偏移量开始请求剩余数据
-      while (offset < total) {
-        requests.push(connector.querySystems(offset, pageSize, false));
-        offset += pageSize;
-      }
-
-      // 并行请求所有剩余页面
-      if (requests.length > 0) {
-        const responses = await Promise.all(requests);
-        for (const response of responses) {
-          if (response?.data?.records) {
-            allSystems = [...allSystems, ...response.data.records];
-          }
-        }
-      }
-
+      const allSystems = await getAllSystems(connector, false);
       // 处理系统模板数据
       const resources: ResourceContent[] = [];
-      if (Array.isArray(allSystems)) {
-        // 构建返回多个resource对象
-        allSystems.forEach((system: GuestSystemView) => {
-          if (system.id !== undefined) {
-            const systemURI = `${this.uri}${system.id}`;
-            const text = marshalSystemView(system);
-            resources.push({
-              uri: systemURI,
-              mimeType: this.mimeType,
-              text: text,
-            });
-          } else {
-            logger.warn("发现没有ID的系统模板，跳过资源创建");
-          }
+      allSystems.forEach((system: GuestSystemView) => {
+        if (!system.id) {
+          throw new Error("系统模板ID不能为空");
+        }
+        const systemURI = `${this.uri}${system.id}`;
+        const text = marshalSystemView(system);
+        resources.push({
+          uri: systemURI,
+          mimeType: this.mimeType,
+          text: text,
         });
-      } else {
-        logger.warn("系统模板数据格式不正确");
-      }
+      });
 
       return resources;
     } catch (error) {

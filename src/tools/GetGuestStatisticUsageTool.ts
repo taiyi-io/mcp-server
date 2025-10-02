@@ -66,7 +66,8 @@ class GetGuestStatisticUsageTool extends MCPTool<GetGuestStatisticUsageInput> {
   schema = {
     guestID: {
       type: z.string(),
-      description: "云主机的ID",
+      description:
+        "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
     },
     range: {
       type: z.enum([
@@ -76,7 +77,7 @@ class GetGuestStatisticUsageTool extends MCPTool<GetGuestStatisticUsageInput> {
         StatisticRange.Last7Days,
       ]),
       description:
-        "历史数据统计范围，可选值为last_hour, last_24_hours, last_7_days, last_30_days，对应最近1小时、最近24小时、最近7天、最近30天",
+        "历史数据统计范围，可选值为last_hour, last_24_hours, last_7_days, last_30_days，对应最近1小时、最近24小时、最近7天、最近30天。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法",
       example: StatisticRange.LastHour,
     },
   };

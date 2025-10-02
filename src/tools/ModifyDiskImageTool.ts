@@ -11,12 +11,14 @@ interface ModifyDiskImageInput {
 
 class ModifyDiskImageTool extends MCPTool<ModifyDiskImageInput> {
   name = "modify-disk-image";
-  description = "指定id，修改磁盘镜像的名称、描述和标签信息";
+  description =
+    "指定id，修改磁盘镜像的名称、描述和标签信息。可以通过mcp-tool:find-disk-image-id-by-name输入磁盘镜像名称获得磁盘镜像ID，再调用本接口";
 
   schema = {
     imageID: {
       type: z.string(),
-      description: "磁盘镜像的ID",
+      description:
+        "磁盘镜像的ID。如果仅有磁盘镜像名称，可以通过mcp-tool:find-disk-image-id-by-name获取磁盘镜像ID",
     },
     name: {
       type: z.string().nonempty(),

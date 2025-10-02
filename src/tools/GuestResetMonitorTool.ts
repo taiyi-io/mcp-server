@@ -9,12 +9,13 @@ interface GuestResetMonitorInput {
 class GuestResetMonitorTool extends MCPTool<GuestResetMonitorInput> {
   name = "guest-reset-monitor";
   description =
-    "指定云主机ID，重置云主机的监控密码，影响远程控制权限，重置后需要使用新密码登录";
+    "指定云主机ID，重置云主机的监控密码，影响远程控制权限，重置后需要使用新密码登录。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
 
   schema = {
     guestID: {
       type: z.string(),
-      description: "云主机的ID",
+      description:
+        "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
     },
   };
 

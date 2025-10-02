@@ -9,12 +9,14 @@ interface UnmarkSystemDiskImageInput {
 
 class UnmarkSystemDiskImageTool extends MCPTool<UnmarkSystemDiskImageInput> {
   name = "unmark-system-disk-image";
-  description = "根据指定id取消磁盘镜像的系统标记";
+  description =
+    "根据指定id取消磁盘镜像的系统标记。可以通过mcp-tool:find-disk-image-id-by-name输入磁盘镜像名称获得磁盘镜像ID，再调用本接口";
 
   schema = {
     imageID: {
       type: z.string(),
-      description: "磁盘镜像的ID",
+      description:
+        "磁盘镜像的ID。如果仅有磁盘镜像名称，可以通过mcp-tool:find-disk-image-id-by-name获取磁盘镜像ID",
     },
   };
 

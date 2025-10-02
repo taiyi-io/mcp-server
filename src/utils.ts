@@ -6,10 +6,14 @@ import {
   FileView,
   GuestFilter,
   GuestState,
+  GuestSystemView,
   GuestView,
   ResourceAction,
   ResourcePermissions,
   TaiyiConnector,
+  TaskData,
+  TaskStatus,
+  TaskType,
 } from "@taiyi-io/api-connector-ts";
 
 interface priviledgeObject {
@@ -387,4 +391,310 @@ export function marshalGuestView(view: GuestView): string {
   marshalPermissions(view, obj);
 
   return JSON.stringify(obj);
+}
+
+export async function getAllDiskImages(
+  connector: TaiyiConnector,
+  selfOnly: boolean
+): Promise<FileView[]> {
+  let allImages: FileView[] = [];
+  let offset = 0;
+  const pageSize = 20;
+  let total = 0;
+
+  // 第一次请求获取总数
+  const firstResponse = await connector.queryDiskFiles(
+    offset,
+    pageSize,
+    selfOnly
+  );
+  if (firstResponse.error) {
+    throw new Error(firstResponse.error);
+  } else if (!firstResponse?.data) {
+    throw new Error("获取磁盘镜像列表失败：返回数据为空");
+  }
+  total = firstResponse?.data?.total || 0;
+  allImages = firstResponse?.data?.records
+    ? [...firstResponse.data.records]
+    : [];
+
+  // 根据总数计算需要请求的偏移量
+  const requests = [];
+  offset += pageSize;
+
+  // 从下一个偏移量开始请求剩余数据
+  while (offset < total) {
+    requests.push(connector.queryDiskFiles(offset, pageSize, selfOnly));
+    offset += pageSize;
+  }
+
+  // 并行请求所有剩余页面
+  if (requests.length > 0) {
+    const responses = await Promise.all(requests);
+    for (const response of responses) {
+      //校验返回结果
+      if (response.error) {
+        throw new Error(response.error);
+      } else if (!response?.data) {
+        throw new Error("获取磁盘镜像列表失败：返回数据为空");
+      }
+      if (response?.data?.records) {
+        allImages = [...allImages, ...response.data.records];
+      }
+    }
+  }
+  return allImages;
+}
+
+//getAllISOImages
+export async function getAllISOImages(
+  connector: TaiyiConnector,
+  selfOnly: boolean
+): Promise<FileView[]> {
+  let allImages: FileView[] = [];
+  let offset = 0;
+  const pageSize = 20;
+  let total = 0;
+
+  // 第一次请求获取总数
+  const firstResponse = await connector.queryISOFiles(
+    offset,
+    pageSize,
+    selfOnly
+  );
+  if (firstResponse.error) {
+    throw new Error(firstResponse.error);
+  } else if (!firstResponse?.data) {
+    throw new Error("获取ISO镜像列表失败：返回数据为空");
+  }
+  total = firstResponse?.data?.total || 0;
+  allImages = firstResponse?.data?.records
+    ? [...firstResponse.data.records]
+    : [];
+
+  // 根据总数计算需要请求的偏移量
+  const requests = [];
+  offset += pageSize;
+
+  // 从下一个偏移量开始请求剩余数据
+  while (offset < total) {
+    requests.push(connector.queryISOFiles(offset, pageSize, selfOnly));
+    offset += pageSize;
+  }
+
+  // 并行请求所有剩余页面
+  if (requests.length > 0) {
+    const responses = await Promise.all(requests);
+    for (const response of responses) {
+      //校验返回结果
+      if (response.error) {
+        throw new Error(response.error);
+      } else if (!response?.data) {
+        throw new Error("获取ISO镜像列表失败：返回数据为空");
+      }
+      if (response?.data?.records) {
+        allImages = [...allImages, ...response.data.records];
+      }
+    }
+  }
+  return allImages;
+}
+
+export async function getAllSystems(
+  connector: TaiyiConnector,
+  selfOnly: boolean
+): Promise<GuestSystemView[]> {
+  let allSystems: GuestSystemView[] = [];
+  let offset = 0;
+  const pageSize = 20;
+  let total = 0;
+
+  // 第一次请求获取总数
+  const firstResponse = await connector.querySystems(
+    offset,
+    pageSize,
+    selfOnly
+  );
+  if (firstResponse.error) {
+    throw new Error(firstResponse.error);
+  } else if (!firstResponse?.data) {
+    throw new Error("获取系统模板列表失败：返回数据为空");
+  }
+  total = firstResponse?.data?.total || 0;
+  allSystems = firstResponse?.data?.records
+    ? [...firstResponse.data.records]
+    : [];
+
+  // 根据总数计算需要请求的偏移量
+  const requests = [];
+  offset += pageSize;
+
+  // 从下一个偏移量开始请求剩余数据
+  while (offset < total) {
+    requests.push(connector.querySystems(offset, pageSize, selfOnly));
+    offset += pageSize;
+  }
+
+  // 并行请求所有剩余页面
+  if (requests.length > 0) {
+    const responses = await Promise.all(requests);
+    for (const response of responses) {
+      //校验返回结果
+      if (response.error) {
+        throw new Error(response.error);
+      } else if (!response?.data) {
+        throw new Error("获取云主机系统列表失败：返回数据为空");
+      }
+      if (response?.data?.records) {
+        allSystems = [...allSystems, ...response.data.records];
+      }
+    }
+  }
+  return allSystems;
+}
+
+export async function findSystemIDByLabel(
+  connector: TaiyiConnector,
+  label: string
+): Promise<string> {
+  const systems = await getAllSystems(connector, false);
+  const system = systems.find((s) => s.label === label);
+  if (!system) {
+    throw new Error(`未找到名称为 ${label} 的系统模板`);
+  }
+  return system.id || "";
+}
+
+//findGuestIDByName
+export async function findGuestIDByName(
+  connector: TaiyiConnector,
+  name: string
+): Promise<string> {
+  const guests = await queryGuests(connector, false);
+  const guest = guests.find((s) => s.name === name);
+  if (!guest) {
+    throw new Error(`未找到名称为 ${name} 的云主机`);
+  }
+  return guest.id;
+}
+
+//findDiskImageIDByName
+export async function findDiskImageIDByName(
+  connector: TaiyiConnector,
+  name: string
+): Promise<string> {
+  const images = await getAllDiskImages(connector, false);
+  const image = images.find((s) => s.name === name);
+  if (!image) {
+    throw new Error(`未找到名称为 ${name} 的磁盘镜像`);
+  }
+  return image.id;
+}
+
+//findISOImageIDByName
+export async function findISOImageIDByName(
+  connector: TaiyiConnector,
+  name: string
+): Promise<string> {
+  const images = await getAllISOImages(connector, false);
+  const image = images.find((s) => s.name === name);
+  if (!image) {
+    throw new Error(`未找到名称为 ${name} 的ISO镜像`);
+  }
+  return image.id;
+}
+
+export function taskTypeName(taskType: TaskType): string {
+  switch (taskType) {
+    case TaskType.CreateGuest:
+      return "创建云主机";
+    case TaskType.DeleteGuest:
+      return "删除云主机";
+    case TaskType.AddVolume:
+      return "添加卷";
+    case TaskType.DeleteVolume:
+      return "删除卷";
+    case TaskType.AddExternalInterface:
+      return "添加外部接口";
+    case TaskType.RemoveExternalInterface:
+      return "移除外部接口";
+    case TaskType.AddInternalInterface:
+      return "添加内部接口";
+    case TaskType.RemoveInternalInterface:
+      return "移除内部接口";
+    case TaskType.ModifyCPU:
+      return "修改CPU";
+    case TaskType.ModifyMemory:
+      return "修改内存";
+    case TaskType.ModifyHostname:
+      return "修改主机名";
+    case TaskType.ResetMonitor:
+      return "重置监控密码";
+    case TaskType.StartGuest:
+      return "启动云主机";
+    case TaskType.StopGuest:
+      return "停止云主机";
+    case TaskType.ModifyPassword:
+      return "修改密码";
+    case TaskType.ModifyAutoStart:
+      return "修改自动启动";
+    case TaskType.InsertMedia:
+      return "插入介质";
+    case TaskType.EjectMedia:
+      return "弹出介质";
+    case TaskType.ResizeDisk:
+      return "调整磁盘大小";
+    case TaskType.ShrinkDisk:
+      return "收缩磁盘";
+    case TaskType.InstallDiskImage:
+      return "安装磁盘镜像";
+    case TaskType.CreateDiskImage:
+      return "创建磁盘镜像";
+    case TaskType.SyncISOFiles:
+      return "同步ISO文件";
+    case TaskType.SyncDiskFiles:
+      return "同步磁盘文件";
+    case TaskType.CreateSnapshot:
+      return "创建快照";
+    case TaskType.DeleteSnapshot:
+      return "删除快照";
+    case TaskType.RestoreSnapshot:
+      return "恢复快照";
+    case TaskType.AddRemoteContainer:
+      return "添加远程存储容器";
+    case TaskType.ModifyRemoteContainer:
+      return "修改远程存储容器";
+    case TaskType.RemoveRemoteContainer:
+      return "移除远程存储容器";
+    case TaskType.ReloadResourceStorage:
+      return "重新加载资源存储";
+    case TaskType.ImportGuests:
+      return "导入云主机";
+    case TaskType.MigrateToNode:
+      return "迁移到节点";
+    default:
+      return TaskType[taskType];
+  }
+}
+
+export function marshalTaskData(task: TaskData): string {
+  const taskName = taskTypeName(task.type);
+  // 根据任务状态返回不同的信息
+  if (task.status === TaskStatus.Completed) {
+    if (task.error) {
+      return `任务${task.id} ${taskName}失败:${task.error}`;
+    } else {
+      return `任务${task.id} ${taskName}成功`;
+    }
+  } else if (task.status === TaskStatus.Pending) {
+    return `任务${task.id} ${taskName} 正在等待执行`;
+  } else if (task.status === TaskStatus.Running) {
+    if (task.progress && task.progress > 0) {
+      return `任务${task.id} ${taskName} 处理中：进度 ${task.progress} %`;
+    } else {
+      return `任务${task.id} ${taskName} 处理中...`;
+    }
+  } else {
+    return `任务${task.id} ${taskName} 状态：${task.status}`;
+  }
 }

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 class GuestModifyMemoryTool extends MCPTool {
     name = "guest-modify-memory";
-    description = "指定云主机ID和目标内存大小，修改云主机的内存容量，内存大小必须为2的倍数（MB）";
+    description = "指定云主机ID和目标内存大小，修改云主机的内存容量，内存大小必须为2的倍数（MB）。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
     schema = {
         guestID: {
             type: z.string(),
-            description: "云主机的ID",
+            description: "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
         },
         memoryMB: {
             type: z.string().refine((val) => {

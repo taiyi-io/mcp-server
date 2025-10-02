@@ -3,11 +3,11 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 class GuestRemoveVolumeTool extends MCPTool {
     name = "guest-remove-volume";
-    description = "指定云主机ID和磁盘标签，删除数据磁盘。不支持删除系统磁盘";
+    description = "指定云主机ID和磁盘标签，删除数据磁盘。不支持删除系统磁盘。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
     schema = {
         guestID: {
             type: z.string(),
-            description: "云主机的ID",
+            description: "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
         },
         tag: {
             type: z.string().regex(/^data_\d+$/),

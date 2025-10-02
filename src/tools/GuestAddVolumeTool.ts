@@ -10,12 +10,14 @@ interface GuestAddVolumeInput {
 
 class GuestAddVolumeTool extends MCPTool<GuestAddVolumeInput> {
   name = "guest-add-volume";
-  description = "指定云主机ID，添加数据磁盘到云主机";
+  description =
+    "指定云主机ID，添加数据磁盘到云主机。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
 
   schema = {
     guestID: {
       type: z.string(),
-      description: "云主机的ID",
+      description:
+        "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
     },
     sizeInGB: {
       type: z.string().refine(

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 class GuestModifyCoresTool extends MCPTool {
     name = "guest-modify-cores";
-    description = "指定云主机ID和目标核心数，修改云主机的CPU核心数量，核心数必须是1或2的倍数";
+    description = "指定云主机ID和目标核心数，修改云主机的CPU核心数量，核心数必须是1或2的倍数。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
     schema = {
         guestID: {
             type: z.string(),
-            description: "云主机的ID",
+            description: "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
         },
         cores: {
             type: z.string().refine((val) => {

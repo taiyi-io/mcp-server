@@ -11,12 +11,13 @@ interface GetIsoImageDetailInput {
 class GetIsoImageDetailTool extends MCPTool<GetIsoImageDetailInput> {
   name = "get-iso-image-detail";
   description =
-    "根据指定id获取ISO镜像详情，包含镜像容量、名称描述和创建修改时间信息";
+    "根据指定id获取ISO镜像详情，包含镜像容量、名称描述和创建修改时间信息。可以通过mcp-tool:find-iso-image-id-by-name输入ISO镜像名称获得ISO镜像ID，再调用本接口";
 
   schema = {
     imageID: {
       type: z.string(),
-      description: "ISO镜像的ID",
+      description:
+        "ISO镜像的ID。如果仅有ISO镜像名称，可以通过mcp-tool:find-iso-image-id-by-name获取ISO镜像ID",
     },
   };
 

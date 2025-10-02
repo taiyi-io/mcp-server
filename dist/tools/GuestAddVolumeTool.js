@@ -4,14 +4,14 @@ import { getConnector } from "../server.js";
 import { VolumeFormat } from "@taiyi-io/api-connector-ts";
 class GuestAddVolumeTool extends MCPTool {
     name = "guest-add-volume";
-    description = "指定云主机ID，添加数据磁盘到云主机";
+    description = "指定云主机ID，添加数据磁盘到云主机。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
     schema = {
         guestID: {
             type: z.string(),
-            description: "云主机的ID",
+            description: "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
         },
         sizeInGB: {
-            type: z.string().refine(val => {
+            type: z.string().refine((val) => {
                 const num = parseInt(val);
                 return !isNaN(num) && num >= 1;
             }, { message: "磁盘容量必须是大于等于1的整数" }),
@@ -31,11 +31,11 @@ class GuestAddVolumeTool extends MCPTool {
             }
             // 检查tag，找到尚未使用的data_{index}
             let index = 1;
-            const existingTags = guestResult.data?.disks?.map(disk => disk.tag) || [];
-            while (existingTags.includes(`data_${index}`)) {
+            const existingTags = guestResult.data?.disks?.map((disk) => disk.tag) || [];
+            while (existingTags.includes(`data${index}`)) {
                 index++;
             }
-            const tag = `data_${index}`;
+            const tag = `data${index}`;
             const sizeInMB = size * 1024;
             // 生成VolumeSpec
             const volumeSpec = {

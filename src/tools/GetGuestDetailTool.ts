@@ -11,12 +11,13 @@ interface GetGuestDetailInput {
 class GetGuestDetailTool extends MCPTool<GetGuestDetailInput> {
   name = "get-guest-detail";
   description =
-    "根据指定ID获取云主机详情，包含标识、主机名、核心数、内存、磁盘配置、网卡MAC及IP、运行状态、网络速度、磁盘io带宽、所属宿主机资源池和权限信息，通常用于查看和判断云主机";
+    "根据指定ID获取云主机详情，包含标识、主机名、核心数、内存、磁盘配置、网卡MAC及IP、运行状态、网络速度、磁盘io带宽、所属宿主机资源池和权限信息，通常用于查看和判断云主机。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
 
   schema = {
     guestID: {
       type: z.string(),
-      description: "云主机的ID",
+      description:
+        "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
     },
   };
 

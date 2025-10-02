@@ -43,11 +43,11 @@ function marshalSystemView(view) {
 }
 class GetSystemDetailTool extends MCPTool {
     name = "get-system-detail";
-    description = "根据指定id获取系统详情，包含标识、名称、操作系统、磁盘、网络、显卡、控制协议、启动方式等硬件配置以及权限信息";
+    description = "根据指定id获取系统详情，包含标识、名称、操作系统、磁盘、网络、显卡、控制协议、启动方式等硬件配置以及权限信息。如果仅知道系统名称，可以通过mcp-tool:find-system-id-by-name获取系统id，再调用本方法";
     schema = {
         systemID: {
             type: z.string(),
-            description: "系统的ID",
+            description: "系统模板的ID。如果仅有系统模板名称，可以通过mcp-tool:find-system-id-by-name获取系统模板ID",
         },
     };
     async execute(input) {

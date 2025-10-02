@@ -11,12 +11,13 @@ interface GetDiskImageDetailInput {
 class GetDiskImageDetailTool extends MCPTool<GetDiskImageDetailInput> {
   name = "get-disk-image-detail";
   description =
-    "根据指定id获取磁盘镜像详情，包含镜像容量、名称描述和创建修改时间信息";
+    "根据指定id获取磁盘镜像详情，包含镜像容量、名称描述和创建修改时间信息。可以通过mcp-tool:find-disk-image-id-by-name输入磁盘镜像名称获得磁盘镜像ID，再调用本接口";
 
   schema = {
     imageID: {
       type: z.string(),
-      description: "磁盘镜像的ID",
+      description:
+        "磁盘镜像的ID。如果仅有磁盘镜像名称，可以通过mcp-tool:find-disk-image-id-by-name获取磁盘镜像ID",
     },
   };
 

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 class GuestRemoveNetworkInterfaceTool extends MCPTool {
     name = "guest-remove-network-interface";
-    description = "指定云主机ID和网卡MAC地址，删除云主机的网络接口；支持删除外部网卡和内部网卡，通过external参数指定，默认删除外部网卡";
+    description = "指定云主机ID和网卡MAC地址，删除云主机的网络接口；支持删除外部网卡和内部网卡，通过external参数指定，默认删除外部网卡。如果仅知道云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机id，再调用本方法";
     schema = {
         guestID: {
             type: z.string(),
-            description: "云主机的ID",
+            description: "云主机的ID。如果仅有云主机名称，可以通过mcp-tool:find-guest-id-by-name获取云主机ID",
         },
         macAddress: {
             type: z.string().regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/),
