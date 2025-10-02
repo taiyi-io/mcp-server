@@ -15,8 +15,8 @@ interface CreateDiskImageInput {
   access_level: ResourceAccessLevel;
 }
 
-class CreateDiskImageTool extends MCPTool<CreateDiskImageInput> {
-  name = "create-disk-image";
+class GuestCreateDiskImageTool extends MCPTool<CreateDiskImageInput> {
+  name = "guest-create-disk-image";
   description = "使用云主机的系统盘创建磁盘镜像，支持同步等待结果";
 
   schema = {
@@ -102,4 +102,4 @@ class CreateDiskImageTool extends MCPTool<CreateDiskImageInput> {
   }
 }
 
-export default CreateDiskImageTool;
+export default GuestCreateDiskImageTool;

@@ -2,17 +2,16 @@ import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
 import { TaiyiConnector } from "@taiyi-io/api-connector-ts";
-import { marshalTaskData } from "../utils.js";
 
-interface InstallDiskImageInput {
+interface GuestRestoreSnapshotInput {
   guestID: string;
-  diskImageID: string;
-  sync: boolean;
+  snapshotID: string;
+  sync?: boolean;
 }
 
-class InstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
-  name = "install-disk-image";
-  description = "把磁盘镜像安装到目标云主机，支持同步等待结果";
+class GuestRestoreSnapshotTool extends MCPTool<GuestRestoreSnapshotInput> {
+  name = "guest-restore-snapshot";
+  description = "恢复云主机快照，支持同步等待结果";
 
   schema = {
     guestID: {
@@ -20,45 +19,43 @@ class InstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
       description:
         "目标云主机ID，如果仅有名称，可以通过mcp-tool:find-guest-id-by-name获取ID",
     },
-    diskImageID: {
+    snapshotID: {
       type: z.string(),
-      description:
-        "磁盘镜像ID，如果仅有名称，可以通过mcp-tool:find-disk-image-id-by-name获取ID",
+      description: "快照ID。可以从mcp-tool:guest-query-snapshots获取",
     },
     sync: {
-      type: z.boolean(),
+      type: z.boolean().optional(),
       description: "是否同步等待结果，默认否",
       default: false,
     },
   };
 
-  async execute(input: InstallDiskImageInput) {
+  async execute(input: GuestRestoreSnapshotInput) {
     try {
       const connector: TaiyiConnector = await getConnector();
 
-      // 调用connector安装磁盘镜像
-      const result = await connector.tryInstallDiskImage(
+      // 调用connector恢复云主机快照
+      const result = await connector.tryRestoreSnapshot(
         input.guestID,
-        "sys",
-        input.diskImageID
+        input.snapshotID
       );
 
       if (result.error) {
         throw new Error(result.error);
       } else if (!result.data) {
-        throw new Error("安装磁盘镜像失败：获取任务ID失败");
+        throw new Error("恢复快照失败：获取任务ID失败");
       }
 
       const taskID = result.data;
 
       // 异步处理情况
       if (!input.sync) {
-        return `安装镜像任务启动，ID：${taskID}，可调用mcp-tool:check-task检查执行结果`;
+        return `开始恢复快照，ID：${taskID}，调用mcp-tool:check-task检查执行结果`;
       }
 
       // 同步等待结果，等待20分钟，间隔10秒
-      const waitTimeout = 20 * 60;
-      const waitInterval = 10;
+      const waitTimeout = 10 * 60;
+      const waitInterval = 5;
       const taskResult = await connector.waitTask(
         taskID,
         waitTimeout,
@@ -66,12 +63,10 @@ class InstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
       );
       if (taskResult.error) {
         throw new Error(taskResult.error);
-      } else if (!taskResult.data) {
-        throw new Error("安装磁盘镜像失败：获取任务结果失败");
       }
-      return marshalTaskData(taskResult.data);
+      return `云主机${input.guestID}快照恢复成功`;
     } catch (error) {
-      const output = `安装磁盘镜像失败: ${
+      const output = `恢复云主机快照失败: ${
         error instanceof Error ? error.message : String(error)
       }`;
       logger.error(output);
@@ -80,4 +75,4 @@ class InstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
   }
 }
 
-export default InstallDiskImageTool;
+export default GuestRestoreSnapshotTool;
