@@ -13,11 +13,6 @@ class GuestStartWithMediaTool extends MCPTool {
             type: z.string(),
             description: "ISO镜像ID，如果仅有名称，可以通过mcp-tool:find-iso-image-id-by-name获取ID",
         },
-        sync: {
-            type: z.boolean().optional(),
-            description: "是否同步等待结果，默认否",
-            default: false,
-        },
     };
     async execute(input) {
         try {
@@ -31,18 +26,7 @@ class GuestStartWithMediaTool extends MCPTool {
                 throw new Error("启动云主机失败：获取任务ID失败");
             }
             const taskID = result.data;
-            // 异步处理情况
-            if (!input.sync) {
-                return `开始启动云主机，ID：${taskID}，调用mcp-tool:check-task检查执行结果`;
-            }
-            // 同步等待结果，等待20分钟，间隔10秒
-            const waitTimeout = 10 * 60;
-            const waitInterval = 5;
-            const taskResult = await connector.waitTask(taskID, waitTimeout, waitInterval);
-            if (taskResult.error) {
-                throw new Error(taskResult.error);
-            }
-            return `云主机${input.guestID}启动成功`;
+            return `新任务${taskID}已启动，开始使用ISO镜像${input.mediaID}引导启动云主机${input.guestID}。可调用mcp-tool:check-task检查执行结果`;
         }
         catch (error) {
             const output = `启动云主机失败: ${error instanceof Error ? error.message : String(error)}`;

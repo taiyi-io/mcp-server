@@ -3,7 +3,6 @@ import { z } from "zod";
 interface GuestRestoreSnapshotInput {
     guestID: string;
     snapshotID: string;
-    sync?: boolean;
 }
 declare class GuestRestoreSnapshotTool extends MCPTool<GuestRestoreSnapshotInput> {
     name: string;
@@ -16,11 +15,6 @@ declare class GuestRestoreSnapshotTool extends MCPTool<GuestRestoreSnapshotInput
         snapshotID: {
             type: z.ZodString;
             description: string;
-        };
-        sync: {
-            type: z.ZodOptional<z.ZodBoolean>;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: GuestRestoreSnapshotInput): Promise<string>;

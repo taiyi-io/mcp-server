@@ -4,7 +4,6 @@ interface GuestCreateSnapshotInput {
     guestID: string;
     label: string;
     description?: string;
-    sync?: boolean;
 }
 declare class GuestCreateSnapshotTool extends MCPTool<GuestCreateSnapshotInput> {
     name: string;
@@ -21,11 +20,6 @@ declare class GuestCreateSnapshotTool extends MCPTool<GuestCreateSnapshotInput> 
         description: {
             type: z.ZodOptional<z.ZodString>;
             description: string;
-        };
-        sync: {
-            type: z.ZodOptional<z.ZodBoolean>;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: GuestCreateSnapshotInput): Promise<string>;

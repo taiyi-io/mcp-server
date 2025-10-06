@@ -1,7 +1,7 @@
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
-import { marshalTaskData } from "../utils.js";
+import { marshalTaskStatus } from "../utils.js";
 class CheckTaskTool extends MCPTool {
     name = "check-task";
     description = "检查任务执行进度，获取失败或者成功的执行结果；如果任务还在处理中，可以等待一段时间后重试，比如间隔10-30秒重试";
@@ -24,7 +24,7 @@ class CheckTaskTool extends MCPTool {
             }
             const task = result.data;
             // 获取任务类型的中文描述
-            return marshalTaskData(task);
+            return marshalTaskStatus(task);
         }
         catch (error) {
             const output = `检查任务 ${input.taskID} 失败：${error instanceof Error ? error.message : String(error)}`;

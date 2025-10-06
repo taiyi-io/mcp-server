@@ -1,13 +1,8 @@
 import { MCPTool, logger } from "mcp-framework";
 import { z } from "zod";
 import { getConnector } from "../server.js";
-import {
-  TaiyiConnector,
-  TaskData,
-  TaskStatus,
-  TaskType,
-} from "@taiyi-io/api-connector-ts";
-import { marshalTaskData } from "../utils.js";
+import { TaiyiConnector, TaskData } from "@taiyi-io/api-connector-ts";
+import { marshalTaskStatus } from "../utils.js";
 
 interface CheckTaskInput {
   taskID: string;
@@ -39,7 +34,7 @@ class CheckTaskTool extends MCPTool<CheckTaskInput> {
 
       const task: TaskData = result.data;
       // 获取任务类型的中文描述
-      return marshalTaskData(task);
+      return marshalTaskStatus(task);
     } catch (error) {
       const output = `检查任务 ${input.taskID} 失败：${
         error instanceof Error ? error.message : String(error)

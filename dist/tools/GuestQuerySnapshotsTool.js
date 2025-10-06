@@ -3,6 +3,9 @@ import { z } from "zod";
 import { getConnector } from "../server.js";
 function marshalSnapshotsData(snapshots) {
     const result = [];
+    if (snapshots.length == 0) {
+        return "尚未创建快照";
+    }
     snapshots.forEach((snapshotNode) => {
         const snapshotData = {};
         // 映射字段

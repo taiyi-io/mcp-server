@@ -19,5 +19,5 @@ export declare function findGuestIDByName(connector: TaiyiConnector, name: strin
 export declare function findDiskImageIDByName(connector: TaiyiConnector, name: string): Promise<string>;
 export declare function findISOImageIDByName(connector: TaiyiConnector, name: string): Promise<string>;
 export declare function taskTypeName(taskType: TaskType): string;
-export declare function marshalTaskData(task: TaskData): string;
+export declare function marshalTaskStatus(task: TaskData): string;
 export {};

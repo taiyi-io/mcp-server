@@ -5,7 +5,6 @@ interface CreateDiskImageInput {
     guestID: string;
     imageName: string;
     imageDescription?: string;
-    sync: boolean;
     access_level: ResourceAccessLevel;
 }
 declare class GuestCreateDiskImageTool extends MCPTool<CreateDiskImageInput> {
@@ -28,11 +27,6 @@ declare class GuestCreateDiskImageTool extends MCPTool<CreateDiskImageInput> {
         imageDescription: {
             type: z.ZodOptional<z.ZodString>;
             description: string;
-        };
-        sync: {
-            type: z.ZodBoolean;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: CreateDiskImageInput): Promise<string>;

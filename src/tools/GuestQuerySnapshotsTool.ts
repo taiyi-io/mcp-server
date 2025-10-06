@@ -5,6 +5,9 @@ import { TaiyiConnector, SnapshotTreeNode } from "@taiyi-io/api-connector-ts";
 
 function marshalSnapshotsData(snapshots: SnapshotTreeNode[]): string {
   const result: Record<string, any>[] = [];
+  if (snapshots.length == 0) {
+    return "尚未创建快照";
+  }
 
   snapshots.forEach((snapshotNode) => {
     const snapshotData: Record<string, any> = {};

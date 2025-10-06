@@ -2,7 +2,6 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 interface GuestStartInput {
     guestID: string;
-    sync?: boolean;
 }
 declare class GuestStartTool extends MCPTool<GuestStartInput> {
     name: string;
@@ -11,11 +10,6 @@ declare class GuestStartTool extends MCPTool<GuestStartInput> {
         guestID: {
             type: z.ZodString;
             description: string;
-        };
-        sync: {
-            type: z.ZodOptional<z.ZodBoolean>;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: GuestStartInput): Promise<string>;

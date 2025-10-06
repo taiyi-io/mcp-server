@@ -7,7 +7,6 @@ interface GuestCreateSnapshotInput {
   guestID: string;
   label: string;
   description?: string;
-  sync?: boolean;
 }
 
 class GuestCreateSnapshotTool extends MCPTool<GuestCreateSnapshotInput> {
@@ -27,11 +26,6 @@ class GuestCreateSnapshotTool extends MCPTool<GuestCreateSnapshotInput> {
     description: {
       type: z.string().optional(),
       description: "快照描述",
-    },
-    sync: {
-      type: z.boolean().optional(),
-      description: "是否同步等待结果，默认否",
-      default: false,
     },
   };
 
@@ -54,22 +48,7 @@ class GuestCreateSnapshotTool extends MCPTool<GuestCreateSnapshotInput> {
       const taskID = result.data;
 
       // 异步处理情况
-      if (!input.sync) {
-        return `开始创建快照，ID：${taskID}，调用mcp-tool:check-task检查执行结果`;
-      }
-
-      // 同步等待结果，等待20分钟，间隔10秒
-      const waitTimeout = 10 * 60;
-      const waitInterval = 5;
-      const taskResult = await connector.waitTask(
-        taskID,
-        waitTimeout,
-        waitInterval
-      );
-      if (taskResult.error) {
-        throw new Error(taskResult.error);
-      }
-      return `云主机${input.guestID}快照创建成功`;
+      return `新任务${taskID}已启动，创建快照${input.label}。调用mcp-tool:check-task检查执行结果`;
     } catch (error) {
       const output = `创建云主机快照失败: ${
         error instanceof Error ? error.message : String(error)

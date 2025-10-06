@@ -6,7 +6,6 @@ import { TaiyiConnector } from "@taiyi-io/api-connector-ts";
 interface GuestDeleteSnapshotInput {
   guestID: string;
   snapshotID: string;
-  sync?: boolean;
 }
 
 class GuestDeleteSnapshotTool extends MCPTool<GuestDeleteSnapshotInput> {
@@ -22,11 +21,6 @@ class GuestDeleteSnapshotTool extends MCPTool<GuestDeleteSnapshotInput> {
     snapshotID: {
       type: z.string(),
       description: "快照ID。可以从mcp-tool:guest-query-snapshots获取",
-    },
-    sync: {
-      type: z.boolean().optional(),
-      description: "是否同步等待结果，默认否",
-      default: false,
     },
   };
 
@@ -48,23 +42,7 @@ class GuestDeleteSnapshotTool extends MCPTool<GuestDeleteSnapshotInput> {
 
       const taskID = result.data;
 
-      // 异步处理情况
-      if (!input.sync) {
-        return `开始删除快照，ID：${taskID}，调用mcp-tool:check-task检查执行结果`;
-      }
-
-      // 同步等待结果，等待20分钟，间隔10秒
-      const waitTimeout = 10 * 60;
-      const waitInterval = 5;
-      const taskResult = await connector.waitTask(
-        taskID,
-        waitTimeout,
-        waitInterval
-      );
-      if (taskResult.error) {
-        throw new Error(taskResult.error);
-      }
-      return `云主机${input.guestID}快照删除成功`;
+      return `新任务${taskID}已启动，删除云主机${input.guestID}快照${input.snapshotID}。可调用mcp-tool:check-task检查执行结果`;
     } catch (error) {
       const output = `删除云主机快照失败: ${
         error instanceof Error ? error.message : String(error)

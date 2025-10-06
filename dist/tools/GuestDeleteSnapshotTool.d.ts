@@ -3,7 +3,6 @@ import { z } from "zod";
 interface GuestDeleteSnapshotInput {
     guestID: string;
     snapshotID: string;
-    sync?: boolean;
 }
 declare class GuestDeleteSnapshotTool extends MCPTool<GuestDeleteSnapshotInput> {
     name: string;
@@ -16,11 +15,6 @@ declare class GuestDeleteSnapshotTool extends MCPTool<GuestDeleteSnapshotInput> 
         snapshotID: {
             type: z.ZodString;
             description: string;
-        };
-        sync: {
-            type: z.ZodOptional<z.ZodBoolean>;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: GuestDeleteSnapshotInput): Promise<string>;

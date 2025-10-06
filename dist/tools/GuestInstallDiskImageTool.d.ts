@@ -3,7 +3,6 @@ import { z } from "zod";
 interface InstallDiskImageInput {
     guestID: string;
     diskImageID: string;
-    sync: boolean;
 }
 declare class GuestInstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
     name: string;
@@ -16,11 +15,6 @@ declare class GuestInstallDiskImageTool extends MCPTool<InstallDiskImageInput> {
         diskImageID: {
             type: z.ZodString;
             description: string;
-        };
-        sync: {
-            type: z.ZodBoolean;
-            description: string;
-            default: boolean;
         };
     };
     execute(input: InstallDiskImageInput): Promise<string>;

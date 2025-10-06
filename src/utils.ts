@@ -371,6 +371,7 @@ export function marshalGuestView(view: GuestView): string {
     });
   }
   obj["网卡"] = netLabels.join(" /");
+  obj["创建时间"] = new Date(view.created_time).toLocaleString();
 
   if (view.auto_start === true) {
     obj["开机启动"] = true;
@@ -673,11 +674,11 @@ export function taskTypeName(taskType: TaskType): string {
     case TaskType.MigrateToNode:
       return "迁移到节点";
     default:
-      return TaskType[taskType];
+      return `未知任务类型: ${taskType}`;
   }
 }
 
-export function marshalTaskData(task: TaskData): string {
+export function marshalTaskStatus(task: TaskData): string {
   const taskName = taskTypeName(task.type);
   // 根据任务状态返回不同的信息
   if (task.status === TaskStatus.Completed) {
