@@ -1,4 +1,4 @@
-import { ConsoleEventLevel, ConsoleEventRange, GuestState, ResourceAction, TaskStatus, TaskType, } from "@taiyi-io/api-connector-ts";
+import { ConsoleEventLevel, ConsoleEventRange, GuestState, NodeMode, ResourceAction, TaskStatus, TaskType, } from "@taiyi-io/api-connector-ts";
 export function marshalDiskSpeed(read_bytes_per_second, write_bytes_per_second) {
     //网络与磁盘分开处理
     //1.找出read_bytes_per_second和write_bytes_per_second的最大值
@@ -588,4 +588,151 @@ export function marshalTaskStatus(task) {
     else {
         return `任务${task.id} ${taskName} 状态：${task.status}`;
     }
+}
+export function marshalComputePool(pool) {
+    const obj = {};
+    obj["标识"] = pool.id;
+    if (pool.description) {
+        obj["描述"] = pool.description;
+    }
+    if (pool.storage) {
+        obj["存储池"] = pool.storage;
+    }
+    if (pool.address) {
+        obj["地址池"] = pool.address;
+    }
+    if (pool.disabled === true) {
+        obj["已禁用"] = "是";
+    }
+    if (pool.merge_memory === true) {
+        obj["支持内存合并"] = "是";
+    }
+    if (pool.resource) {
+        obj["云主机容量"] = pool.resource.guests;
+        obj["最大核心数"] = pool.resource.cores;
+        obj["最大内存"] = `${pool.resource.memory}MB`;
+        // 将MB转换为GB并保留两位小数
+        const diskInGB = (pool.resource.disk / 1024).toFixed(2);
+        obj["最大磁盘"] = `${diskInGB}GB`;
+    }
+    return JSON.stringify(obj);
+}
+export function marshalSystemView(view) {
+    const obj = {};
+    // 映射属性
+    if (view.id !== undefined) {
+        obj["标识"] = view.id;
+    }
+    if (view.label !== undefined) {
+        obj["名称"] = view.label;
+    }
+    if (view.is_system === true) {
+        obj["系统模板"] = true;
+    }
+    if (view.category !== undefined) {
+        obj["操作系统"] = view.category;
+    }
+    if (view.removable !== undefined) {
+        obj["光驱"] = view.removable;
+    }
+    if (view.disk !== undefined) {
+        obj["磁盘"] = view.disk;
+    }
+    if (view.network !== undefined) {
+        obj["网卡"] = view.network;
+    }
+    if (view.firmware !== undefined) {
+        obj["启动方式"] = view.firmware;
+    }
+    marshalPermissions(view, obj);
+    return JSON.stringify(obj);
+}
+export function marshalNodeData(node) {
+    const nodeData = {};
+    // 映射属性
+    if (node.mode === NodeMode.Control) {
+        nodeData["模式"] = "主控节点";
+    }
+    else if (node.mode === NodeMode.Resource) {
+        nodeData["模式"] = "资源节点";
+    }
+    if (node.id !== undefined) {
+        nodeData["标识"] = node.id;
+    }
+    if (node.name !== undefined) {
+        nodeData["名称"] = node.name;
+    }
+    if (node.host && node.port) {
+        nodeData["服务地址"] = `${node.host}:${node.port}`;
+    }
+    if (node.pool !== undefined) {
+        nodeData["所属资源池"] = node.pool;
+    }
+    if (node.disabled === true) {
+        nodeData["已禁用"] = true;
+    }
+    nodeData["故障"] = `致命${node.critical}, 警报${node.alert}, 告警${node.warning}`;
+    return JSON.stringify(nodeData);
+}
+/**
+   * 分页获取所有任务列表
+   * 参考getAllDiskImages实现
+   */
+export async function getAllTasks(connector) {
+    let allTasks = [];
+    let offset = 0;
+    const pageSize = 20;
+    let total = 0;
+    // 第一次请求获取总数
+    const firstResponse = await connector.queryTasks(offset, pageSize);
+    if (firstResponse.error) {
+        throw new Error(firstResponse.error);
+    }
+    else if (!firstResponse?.data) {
+        throw new Error("获取任务列表失败：返回数据为空");
+    }
+    total = firstResponse?.data?.total || 0;
+    allTasks = firstResponse?.data?.records
+        ? [...firstResponse.data.records]
+        : [];
+    // 根据总数计算需要请求的偏移量
+    const requests = [];
+    offset += pageSize;
+    // 从下一个偏移量开始请求剩余数据
+    while (offset < total) {
+        requests.push(connector.queryTasks(offset, pageSize));
+        offset += pageSize;
+    }
+    // 并行请求所有剩余页面
+    if (requests.length > 0) {
+        const responses = await Promise.all(requests);
+        for (const response of responses) {
+            // 校验返回结果
+            if (response.error) {
+                throw new Error(response.error);
+            }
+            else if (!response?.data) {
+                throw new Error("获取任务列表失败：返回数据为空");
+            }
+            if (response?.data?.records) {
+                allTasks = [...allTasks, ...response.data.records];
+            }
+        }
+    }
+    return allTasks;
+}
+export function marshalStoragePool(pool) {
+    const obj = {};
+    obj["标识"] = pool.id;
+    obj["类型"] = pool.type;
+    obj["分配策略"] = pool.strategy;
+    if (pool.description) {
+        obj["描述"] = pool.description;
+    }
+    obj["存储容器数量"] = pool.containers;
+    obj["已分配磁盘卷"] = pool.allocated_volumes;
+    if (pool.used_size && pool.max_size) {
+        obj["磁盘用量"] = `${(pool.used_size / 1024).toFixed(2)} / ${Math.ceil(pool.max_size / 1024)}GB`;
+    }
+    return JSON.stringify(obj);
 }

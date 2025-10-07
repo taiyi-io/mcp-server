@@ -1,36 +1,6 @@
 import { MCPResource, logger } from "mcp-framework";
 import { getConnector } from "../server.js";
-/**
- * 将ComputePoolStatus对象转换为JSON字符串
- */
-function marshalComputePool(pool) {
-    const obj = {};
-    obj["标识"] = pool.id;
-    if (pool.description) {
-        obj["描述"] = pool.description;
-    }
-    if (pool.storage) {
-        obj["存储池"] = pool.storage;
-    }
-    if (pool.address) {
-        obj["地址池"] = pool.address;
-    }
-    if (pool.disabled === true) {
-        obj["已禁用"] = "是";
-    }
-    if (pool.merge_memory === true) {
-        obj["支持内存合并"] = "是";
-    }
-    if (pool.resource) {
-        obj["云主机容量"] = pool.resource.guests;
-        obj["最大核心数"] = pool.resource.cores;
-        obj["最大内存"] = `${pool.resource.memory}MB`;
-        // 将MB转换为GB并保留两位小数
-        const diskInGB = (pool.resource.disk / 1024).toFixed(2);
-        obj["最大磁盘"] = `${diskInGB}GB`;
-    }
-    return JSON.stringify(obj);
-}
+import { marshalComputePool } from "../utils.js";
 /**
  * 计算资源池列表资源
  * 返回当前用户可以访问的所有计算资源池列表

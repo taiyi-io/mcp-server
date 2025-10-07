@@ -1,23 +1,6 @@
 import { MCPResource, logger } from "mcp-framework";
 import { getConnector } from "../server.js";
-/**
- * 将StoragePoolListRecord对象转换为JSON字符串
- */
-function marshalStoragePool(pool) {
-    const obj = {};
-    obj["标识"] = pool.id;
-    obj["类型"] = pool.type;
-    obj["分配策略"] = pool.strategy;
-    if (pool.description) {
-        obj["描述"] = pool.description;
-    }
-    obj["存储容器数量"] = pool.containers;
-    obj["已分配磁盘卷"] = pool.allocated_volumes;
-    if (pool.used_size && pool.max_size) {
-        obj["磁盘用量"] = `${(pool.used_size / 1024).toFixed(2)} / ${Math.ceil(pool.max_size / 1024)}GB`;
-    }
-    return JSON.stringify(obj);
-}
+import { marshalStoragePool } from "../utils.js";
 /**
  * 存储资源池列表资源
  * 返回当前用户可以访问的所有存储资源池列表

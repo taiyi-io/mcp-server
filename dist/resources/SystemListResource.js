@@ -1,40 +1,6 @@
 import { MCPResource, logger } from "mcp-framework";
 import { getConnector } from "../server.js";
-import { getAllSystems, marshalPermissions } from "../utils.js";
-/**
- * 系统模板视图转换函数
- * 将系统模板对象转换为JSON字符串
- */
-function marshalSystemView(view) {
-    const obj = {};
-    // 映射属性
-    if (view.id !== undefined) {
-        obj["标识"] = view.id;
-    }
-    if (view.label !== undefined) {
-        obj["名称"] = view.label;
-    }
-    if (view.is_system === true) {
-        obj["系统模板"] = true;
-    }
-    if (view.category !== undefined) {
-        obj["操作系统"] = view.category;
-    }
-    if (view.removable !== undefined) {
-        obj["光驱"] = view.removable;
-    }
-    if (view.disk !== undefined) {
-        obj["磁盘"] = view.disk;
-    }
-    if (view.network !== undefined) {
-        obj["网卡"] = view.network;
-    }
-    if (view.firmware !== undefined) {
-        obj["启动方式"] = view.firmware;
-    }
-    marshalPermissions(view, obj);
-    return JSON.stringify(obj);
-}
+import { getAllSystems, marshalSystemView } from "../utils.js";
 /**
  * 系统模板列表资源
  * 返回当前用户可以访问的所有系统模板列表

@@ -5,6 +5,7 @@ import {
   TaiyiConnector,
 } from "@taiyi-io/api-connector-ts";
 import { getConnector } from "../server.js";
+import { marshalNodeData } from "../utils.js";
 
 /**
  * 节点列表资源
@@ -58,38 +59,3 @@ class NodeListResource extends MCPResource {
 }
 
 export default NodeListResource;
-
-function marshalNodeData(node: ClusterNodeData): string {
-  const nodeData: Record<string, any> = {};
-
-  // 映射属性
-  if (node.mode === NodeMode.Control) {
-    nodeData["模式"] = "主控节点";
-  } else if (node.mode === NodeMode.Resource) {
-    nodeData["模式"] = "资源节点";
-  }
-
-  if (node.id !== undefined) {
-    nodeData["标识"] = node.id;
-  }
-
-  if (node.name !== undefined) {
-    nodeData["名称"] = node.name;
-  }
-
-  if (node.host && node.port) {
-    nodeData["服务地址"] = `${node.host}:${node.port}`;
-  }
-
-  if (node.pool !== undefined) {
-    nodeData["所属资源池"] = node.pool;
-  }
-
-  if (node.disabled === true) {
-    nodeData["已禁用"] = true;
-  }
-  nodeData[
-    "故障"
-  ] = `致命${node.critical}, 警报${node.alert}, 告警${node.warning}`;
-  return JSON.stringify(nodeData);
-}

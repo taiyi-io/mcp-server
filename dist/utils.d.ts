@@ -1,4 +1,4 @@
-import { ConsoleEvent, FileRecord, FileView, GuestState, GuestSystemView, GuestView, ResourceAction, ResourcePermissions, TaiyiConnector, TaskData, TaskType } from "@taiyi-io/api-connector-ts";
+import { ClusterNodeData, ComputePoolStatus, ConsoleEvent, FileRecord, FileView, GuestState, GuestSystemView, GuestView, ResourceAction, ResourcePermissions, StoragePoolListRecord, TaiyiConnector, TaskData, TaskType } from "@taiyi-io/api-connector-ts";
 interface priviledgeObject {
     permissions: ResourcePermissions;
     actions?: ResourceAction[];
@@ -20,4 +20,13 @@ export declare function findDiskImageIDByName(connector: TaiyiConnector, name: s
 export declare function findISOImageIDByName(connector: TaiyiConnector, name: string): Promise<string>;
 export declare function taskTypeName(taskType: TaskType): string;
 export declare function marshalTaskStatus(task: TaskData): string;
+export declare function marshalComputePool(pool: ComputePoolStatus): string;
+export declare function marshalSystemView(view: GuestSystemView): string;
+export declare function marshalNodeData(node: ClusterNodeData): string;
+/**
+   * 分页获取所有任务列表
+   * 参考getAllDiskImages实现
+   */
+export declare function getAllTasks(connector: TaiyiConnector): Promise<TaskData[]>;
+export declare function marshalStoragePool(pool: StoragePoolListRecord): string;
 export {};
