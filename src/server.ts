@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { MCPServer, logger } from "mcp-framework";
 import {
   newInsecureConnector,
@@ -49,7 +50,7 @@ await getConnector();
 
 const server = new MCPServer({
   name: "taiyi-cloud",
-  version: "0.11.0",
+  version: "0.10.0",
 });
 
 server.start().catch((error) => {
