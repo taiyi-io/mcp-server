@@ -3,6 +3,8 @@ import { MCPServer, logger } from "mcp-framework";
 import { newInsecureConnector, } from "@taiyi-io/api-connector-ts";
 import os from "os";
 import dotenv from "dotenv";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 //防止输出stdio干扰mcpserver
 dotenv.config({ quiet: true });
 let connector = undefined;
@@ -36,9 +38,11 @@ export async function getConnector() {
 }
 //initialize connector
 await getConnector();
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const server = new MCPServer({
     name: "taiyi-cloud",
-    version: "0.10.0",
+    version: "0.10.2",
+    basePath: __dirname,
 });
 server.start().catch((error) => {
     console.error("Server error:", error);

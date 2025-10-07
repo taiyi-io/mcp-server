@@ -6,6 +6,9 @@ import {
 } from "@taiyi-io/api-connector-ts";
 import os from "os";
 import dotenv from "dotenv";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
 //防止输出stdio干扰mcpserver
 dotenv.config({ quiet: true });
 let connector: TaiyiConnector | undefined = undefined;
@@ -47,10 +50,11 @@ export async function getConnector(): Promise<TaiyiConnector> {
 
 //initialize connector
 await getConnector();
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const server = new MCPServer({
   name: "taiyi-cloud",
-  version: "0.10.0",
+  version: "0.10.2",
+  basePath: __dirname,
 });
 
 server.start().catch((error) => {
